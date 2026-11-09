@@ -37,8 +37,16 @@ jobs:
     needs: publish
     # Runner autoalojado instalado en el PC con Docker Desktop
     runs-on: self-hosted
+    permissions:
+      contents: read
+      packages: read
     steps:
       - uses: actions/checkout@v4
+
+      - name: Iniciar sesión en GitHub Container Registry
+        shell: powershell
+        run: |
+          "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
       - name: Desplegar con docker compose
         shell: powershell
@@ -52,4 +60,4 @@ jobs:
         run: |
           Start-Sleep -Seconds 15
           docker compose ps
-          (Invoke-WebRequest -UseBasicParsing http://localhost/health).StatusCode
+          (Invoke-WebRequest -UseBasicParsing http://localhost:8080/health).StatusCode
