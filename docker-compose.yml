@@ -1,0 +1,50 @@
+services:
+  api1:
+    image: ghcr.io/kevin-molita/prime-api:latest
+    container_name: prime-api1
+    environment:
+      - INSTANCE_NAME=api1
+      - CLIENT_KEYS=clienteA:clave-demo-A,clienteB:clave-demo-B
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  api2:
+    image: ghcr.io/kevin-molita/prime-api:latest
+    container_name: prime-api2
+    environment:
+      - INSTANCE_NAME=api2
+      - CLIENT_KEYS=clienteA:clave-demo-A,clienteB:clave-demo-B
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: prime-balanceador
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - api1
+      - api2
+    restart: unless-stopped
+
+  # Monitoreo: panel en http://localhost:19999
+  netdata:
+    image: netdata/netdata:stable
+    container_name: prime-netdata
+    ports:
+      - "19999:19999"
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - apparmor:unconfined
+    restart: unless-stopped
