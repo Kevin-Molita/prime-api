@@ -27,8 +27,9 @@ jobs:
 
       - name: Construir y publicar la imagen
         run: |
-          IMAGE=ghcr.io/${{ github.repository_owner }}/prime-api
-          docker build -t $IMAGE:latest -t $IMAGE:${{ github.sha }} .
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          IMAGE=ghcr.io/$OWNER/prime-api
+          docker build -t $IMAGE:latest -t $IMAGE:${{ github.sha }} ./api
           docker push $IMAGE:latest
           docker push $IMAGE:${{ github.sha }}
 
