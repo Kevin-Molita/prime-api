@@ -3,11 +3,17 @@
   "version": "1.0.0",
   "description": "API de ejemplo para el proyecto formativo (redundancia, seguridad y monitoreo)",
   "main": "server.js",
-  "scripts": { "start": "node server.js" },
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test --test-reporter=spec"
+  },
   "dependencies": {
     "express": "^4.19.2",
     "express-rate-limit": "^7.4.0",
     "helmet": "^7.1.0",
     "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "supertest": "^7.0.0"
   }
 }

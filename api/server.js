@@ -23,9 +23,11 @@ app.use(express.json({ limit: '10kb' }));
 // Bitácora de accesos: quién, qué, cuándo y qué instancia respondió
 morgan.token('cliente', (req) => req.cliente || '-');
 morgan.token('instancia', () => INSTANCE);
-app.use(
-  morgan(':date[iso] instancia=:instancia cliente=:cliente :method :url :status :response-time ms')
-);
+if (process.env.NODE_ENV !== 'test') {
+  app.use(
+    morgan(':date[iso] instancia=:instancia cliente=:cliente :method :url :status :response-time ms')
+  );
+}
 
 // Ruta pública para verificación de estado (health check)
 app.get('/health', (req, res) => {
@@ -82,4 +84,9 @@ app.get('/api/productos/:id', (req, res) => {
 
 app.use((req, res) => res.status(404).json({ error: 'Ruta no encontrada' }));
 
-app.listen(PORT, () => console.log(`API lista en el puerto ${PORT} (${INSTANCE})`));
+// Solo abre el puerto cuando se ejecuta directamente (no cuando las pruebas importan la app)
+if (require.main === module) {
+  app.listen(PORT, () => console.log(`API lista en el puerto ${PORT} (${INSTANCE})`));
+}
+
+module.exports = app;
